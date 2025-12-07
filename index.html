@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechServe Solutions | Future-Ready Tech</title>
+    <!-- Import Modern Font 'Inter' -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Import Phosphor Icons for UI elements -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* --- GLOBAL STYLES --- */
+        :root {
+            --bg-dark: #0F172A;   /* Deep Slate */
+            --bg-card: #1E293B;   /* Lighter Slate for cards */
+            --primary: #3B82F6;   /* Electric Blue */
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #06B6D4;    /* Cyan for gradients */
+            --text-main: #F1F5F9; /* White-ish */
+            --text-muted: #94A3B8;/* Gray-ish */
+            --border: #334155;    /* Subtle borders */
+            --success: #10B981;   /* Green for Student Portal */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-dark);
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* --- BACKGROUND CANVAS --- */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+
+        a { text-decoration: none; }
+        ul { list-style: none; }
+
+        /* --- ANIMATIONS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- LAYOUT UTILITIES --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-padding {
+            padding: 100px 0;
+        }
+
+        /* --- HEADER / NAV --- */
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            margin-left: 30px;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+        
+        /* Animated Underline for links */
+        .nav-links a:not(.cta-nav)::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:not(.cta-nav):hover::after { width: 100%; }
+
+        .cta-nav {
+            color: var(--text-main) !important;
+            border: 1px solid var(--primary);
+            padding: 8px 20px;
+            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .cta-nav:hover {
+            background: var(--primary) !important;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            color: var(--text-main);
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 160px 0 140px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: var(--text-main);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #60A5FA 0%, #22D3EE 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.3));
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 40px auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 36px;
+            border-radius: 8px; 
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #2563EB 100%);
+            color: var(--white);
+            margin-right: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* --- ABOUT SECTION --- */
+        .about {
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .about p {
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            font-weight: 300;
+        }
+
+        /* --- SERVICES SECTION --- */
+        .services {
+            background-color: rgba(15, 23, 42, 0.95);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .service-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            padding: 35px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px -10px rgba(0,0,0,0.6);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .service-card:hover::before { transform: scaleX(1); }
+
+        .service-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .service-link {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .service-link:hover { color: var(--accent); }
+
+        /* --- PORTFOLIO SECTION --- */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 50px;
+        }
+
+        .portfolio-item {
+            background-color: var(--bg-card);
+            height: 300px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            /* Tech pattern background */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            transition: transform 0.3s ease;
+            /* Flex layout to center content */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .portfolio-item:hover {
+            transform: scale(1.02);
+            border-color: var(--primary);
+        }
+
+        /* Portfolio Gradients */
+        .portfolio-bg-1 { background: radial-gradient(circle at bottom right, rgba(59,130,246,0.15) 0%, transparent 60%); }
+        .portfolio-bg-2 { background: radial-gradient(circle at bottom right, rgba(6,182,212,0.15) 0%, transparent 60%); }
+        .portfolio-bg-3 { background: radial-gradient(circle at bottom right, rgba(168,85,247,0.15) 0%, transparent 60%); }
+        /* Special Style for Student Portal */
+        .portfolio-bg-4 { background: radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
+
+        .portfolio-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, var(--bg-dark) 10%, transparent 100%);
+            padding: 30px 24px 20px;
+            color: white;
+        }
+
+        .portfolio-overlay h4 { font-size: 1.25rem; margin-bottom: 4px; }
+        .portfolio-overlay span { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* --- CONTACT FORM SECTION --- */
+        .contact-section {
+            background: rgba(15, 23, 42, 0.95);
+            padding-bottom: 0;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto 0;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .form-submit-btn:hover {
+            background: #2563EB;
+            transform: translateY(-2px);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: #020617; 
+            color: var(--text-main);
+            padding: 80px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+        }
+
+        footer h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--text-main), var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        .footer-links {
+            margin-top: 30px;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            margin: 0 15px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-card);
+                flex-direction: column;
+                padding: 20px 0;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-150%);
+                transition: transform 0.4s ease;
+                z-index: 999;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+            }
+
+            .nav-links a {
+                margin: 15px 0;
+                font-size: 1.1rem;
+            }
+
+            .cta-nav {
+                width: 80%;
+                text-align: center;
+            }
+
+            .hero h1 { font-size: 2.8rem; padding: 0 10px; }
+            .hero p { font-size: 1.1rem; padding: 0 10px; }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 0 12px 0;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .form-container {
+                padding: 25px;
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- INTERACTIVE BACKGROUND CANVAS -->
+    <canvas id="canvas-bg"></canvas>
+
+    <!-- NAV -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">TechServe Solutions.</div>
+                
+                <!-- Hamburger Icon for Mobile -->
+                <div class="mobile-menu-btn" onclick="toggleMenu()">
+                    <i class="ph ph-list"></i>
+                </div>
+
+                <div class="nav-links" id="navLinks">
+                    <a href="#about" onclick="closeMenu()">About</a>
+                    <a href="#services" onclick="closeMenu()">Services</a>
+                    <a href="#portfolio" onclick="closeMenu()">Portfolio</a>
+                    <a href="#contact" class="cta-nav" onclick="closeMenu()">Get a Quote</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero reveal">
+        <div class="container">
+            <h1>Affordable & Fast <br><span class="gradient-text">Tech Solutions</span> for Africa</h1>
+            <p>We build modern websites, app prototypes, UI/UX designs, and branding — premium quality, optimized for African entrepreneurs.</p>
+            <div>
+                <a href="#contact" class="btn btn-primary">Get a Quote</a>
+                <a href="#portfolio" class="btn btn-outline">View Portfolio</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT US -->
+    <section id="about" class="section-padding about reveal">
+        <div class="container">
+            <span class="section-subtitle">Who We Are</span>
+            <h2 class="section-title">Helping You Go Digital</h2>
+            <p>We are a tech company focused on <b>speed</b> and <b>accessibility</b>. We help small businesses digitize affordably with clean designs, robust code, and flexible payment plans.</p>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="section-padding services">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 50px;" class="reveal">
+                <span class="section-subtitle">Our Stack</span>
+                <h2 class="section-title">Everything You Need</h2>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Service 1 -->
+                <div class="service-card reveal">
+                    <div>
+                        <h3>Website Development</h3>
+                        <p>Fast, responsive websites for businesses, schools, or personal portfolios. SEO-ready and mobile-friendly.</p>
+                    </div>
+                    <!-- Smart Link to Form -->
+                    <a onclick="scrollToContact('Website Development')" class="service-link">View Pricing →</a>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="service-card reveal">
+                    <div>
+                        <h3>App UI/UX Prototypes</h3>
+                        <p>Visualizing your app idea before coding. We create clickable Figma prototypes to show investors.</p>
+                    </div>
+                    <a onclick="scrollToContact('UI/UX Design')" class="service-link">View Pricing →</a>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="service-card reveal">
+                    <div>
+                        <h3>Branding & Design</h3>
+                        <p>Complete identity kits including logos, posters, social media templates, and business cards.</p>
+                    </div>
+                    <a onclick="scrollToContact('Branding')" class="service-link">View Pricing →</a>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="service-card reveal">
+                    <div>
+                        <h3>System Automation</h3>
+                        <p>Save time with automated chatbots, WhatsApp business setups, and Google Workspace integration.</p>
+                    </div>
+                    <a onclick="scrollToContact('Automation')" class="service-link">View Pricing →</a>
+                </div>
+
+                <!-- Service 5 -->
+                <div class="service-card reveal">
+                    <div>
+                        <h3>Tech Consulting</h3>
+                        <p>Not sure where to start? We offer advisory services to help you choose the right tech stack.</p>
+                    </div>
+                    <a onclick="scrollToContact('Consulting')" class="service-link">View Pricing →</a>
+                </div>
+
+                <!-- Service 6 -->
+                <div class="service-card reveal">
+                    <div>
+                        <h3>Business Portals</h3>
+                        <p>Custom management systems for schools, inventory tracking, and client databases.</p>
+                    </div>
+                    <a onclick="scrollToContact('Business Portal')" class="service-link">View Pricing →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="section-padding reveal">
+        <div class="container">
+            <span class="section-subtitle">Our Work</span>
+            <h2 class="section-title">Recent Deployments</h2>
+            <p style="margin-bottom: 30px; color: var(--text-muted); font-size: 1.1rem;">Check out some of our latest products.</p>
+
+            <div class="portfolio-grid">
+                
+                <!-- LINKED PORTFOLIO ITEM: E-COMMERCE -->
+                <a href="https://smyler7.github.io/E-Commerce-/" target="_blank" class="portfolio-item portfolio-bg-1">
+                    <div class="portfolio-overlay">
+                        <h4>E-Commerce Store</h4>
+                        <span>Next.js / Stripe (Click to View)</span>
+                    </div>
+                </a>
+
+                <div class="portfolio-item portfolio-bg-2">
+                    <div class="portfolio-overlay">
+                        <h4>Delivery App</h4>
+                        <span>Flutter / Figma</span>
+                    </div>
+                </div>
+                <div class="portfolio-item portfolio-bg-3">
+                    <div class="portfolio-overlay">
+                        <h4>Corporate Identity</h4>
+                        <span>Adobe Suite</span>
+                    </div>
+                </div>
+                <!-- Student Portal -->
+                <div class="portfolio-item portfolio-bg-4">
+                    <div class="portfolio-overlay">
+                        <h4>Student Results Portal</h4>
+                        <span>React / Python / SQL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION WITH FORMSUBMIT -->
+    <section id="contact" class="section-padding contact-section reveal">
+        <div class="container">
+            <div style="text-align: center;">
+                <span class="section-subtitle">Start Your Project</span>
+                <h2 class="section-title">Get A Free Quote</h2>
+                <p style="color: var(--text-muted);">Tell us what you need, and we’ll build it for you.</p>
+            </div>
+
+            <div class="form-container">
+                <!-- FORMSUBMIT.CO INTEGRATION -->
+                <!-- Replace YOUR_EMAIL_ADDRESS with your actual email below -->
+                <form id="quoteForm" action="https://formsubmit.co/YOUR_EMAIL_ADDRESS" method="POST">
+                    
+                    <!-- Hidden field to disable captcha for cleaner UI -->
+                    <input type="hidden" name="_captcha" value="false">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-input" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-input" placeholder="john@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Service Needed</label>
+                        <select name="service" id="serviceSelect" class="form-select">
+                            <option value="General">General Inquiry</option>
+                            <option value="Website Development">Website Development</option>
+                            <option value="UI/UX Design">App UI/UX Design</option>
+                            <option value="Branding">Branding & Graphics</option>
+                            <option value="Automation">System Automation</option>
+                            <option value="Consulting">Tech Consulting</option>
+                            <option value="Business Portal">Business / School Portal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Project Details</label>
+                        <textarea name="message" class="form-textarea" placeholder="Describe your project briefly..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="form-submit-btn">Send Request</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <h2>TechServe Solutions</h2>
+            <p>Empowering African Businesses with Future-Proof Tech.</p>
+            
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+            </div>
+            
+            <p style="margin-top: 40px; opacity: 0.4; font-size: 0.85rem;">&copy; 2025 TechServe Solutions. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /**
+         * 1. MOBILE MENU TOGGLE
+         */
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const icon = document.querySelector('.mobile-menu-btn i');
+            
+            navLinks.classList.toggle('active');
+            
+            // Toggle icon between List and X
+            if (navLinks.classList.contains('active')) {
+                icon.classList.replace('ph-list', 'ph-x');
+            } else {
+                icon.classList.replace('ph-x', 'ph-list');
+            }
+        }
+
+        function closeMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const icon = document.querySelector('.mobile-menu-btn i');
+            navLinks.classList.remove('active');
+            icon.classList.replace('ph-x', 'ph-list');
+        }
+
+        /**
+         * 2. SMART SCROLL & PRE-SELECT SERVICE
+         */
+        function scrollToContact(serviceName) {
+            const contactSection = document.getElementById('contact');
+            const selectBox = document.getElementById('serviceSelect');
+            contactSection.scrollIntoView({ behavior: 'smooth' });
+            selectBox.value = serviceName;
+        }
+
+        /**
+         * 3. BACKGROUND ANIMATIONS (Particles)
+         */
+        const canvas = document.getElementById("canvas-bg");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particlesArray;
+        let mouse = { x: null, y: null, radius: (canvas.height / 80) * (canvas.width / 80) }
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x; this.y = y; this.directionX = directionX; this.directionY = directionY; this.size = size; this.color = color;
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false); ctx.fillStyle = this.color; ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                let dx = mouse.x - this.x; let dy = mouse.y - this.y; let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < mouse.radius + this.size){
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += 10;
+                    if (mouse.x > this.x && this.x > this.size * 10) this.x -= 10;
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 10;
+                    if (mouse.y > this.y && this.y > this.size * 10) this.y -= 10;
+                }
+                this.x += this.directionX; this.y += this.directionY; this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+                let color = '#3B82F6';
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/20000);
+                        ctx.strokeStyle = 'rgba(59, 130, 246,' + opacityValue + ')';
+                        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y); ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate); ctx.clearRect(0,0,innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); }
+            connect();
+        }
+
+        window.addEventListener('resize', function() {
+            canvas.width = innerWidth; canvas.height = innerHeight; mouse.radius = ((canvas.height/80) * (canvas.height/80)); init();
+        });
+        init(); animate();
+
+        /* SCROLL REVEAL */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('active'); } });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    </script>
+
+</body>
+</html>
+
+
